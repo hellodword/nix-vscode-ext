@@ -1,0 +1,41 @@
+name: Check updates
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 0,12 * * *"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+
+      - name: install nix
+        run: |
+          yes | sh <(curl -L https://nixos.org/nix/install) --no-daemon
+          mkdir -p ~/.config/nix
+          echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+
+      - name: generate
+        run: |
+          . ~/.nix-profile/etc/profile.d/nix.sh
+          go run . -path ./ext.json
+
+      - name: commit
+        run: |
+          export GIT_COMMIT_MESSAGE="update"
+          echo "${GIT_COMMIT_MESSAGE}"
+
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+          if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+            echo "  🟢 Git repo is clean."
+          else
+            git add ext.json
+
+            git commit -m "${GIT_COMMIT_MESSAGE}"
+            git push -u origin master
+          fi
