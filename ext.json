@@ -3,22 +3,22 @@
         "python": {
             "name": "python",
             "publisher": "ms-python",
-            "version": "2023.21.13061009",
-            "sha256": "1fd39q8bv40xx4crhfijpgrp5i4zsndva9mkdq7x4n30bfipd4fj"
+            "version": "2023.21.13071013",
+            "sha256": "10zf3vpz573s9k77d78vqnn84dlfyzmxng6fl883qh1cpbw67xv9"
         }
     },
     "ms-vscode-remote": {
         "remote-containers": {
             "name": "remote-containers",
             "publisher": "ms-vscode-remote",
-            "version": "0.322.0",
-            "sha256": "0irbbdf3137wgmayx1yyg8a3iwhaav6fwplvkhp4i9w2dwm51fy6"
+            "version": "0.318.0",
+            "sha256": "1mp507c7clzbcr0iyjx0w9inajy8k344r367q3vzyw9ic3p6j4ws"
         },
         "remote-ssh": {
             "name": "remote-ssh",
             "publisher": "ms-vscode-remote",
-            "version": "0.108.2023110115",
-            "sha256": "1vf0393l41xi0vc5n9hx5ql7apzy9nmnygh08jmiam4yj2780dj1"
+            "version": "0.107.2023103115",
+            "sha256": "0nfw11wn503j9pyv544jq754zvfi1z6p0b2kpjhwxd0xvmmj6z6l"
         }
     }
 }
