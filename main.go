@@ -5,12 +5,18 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"os/exec"
-	"regexp"
+	"sort"
 	"strings"
+	"time"
+
+	"github.com/Masterminds/semver/v3"
+)
+
+const (
+	ENGINE = "Microsoft.VisualStudio.Code.Engine"
 )
 
 type Ext struct {
@@ -20,29 +26,97 @@ type Ext struct {
 	Sha256    string `json:"sha256"`
 }
 
-func getVersion(publisher, name string) string {
+type QueryResultVersion struct {
+	Version     string    `json:"version"`
+	LastUpdated time.Time `json:"lastUpdated"`
+	Properties  []struct {
+		Key   string `json:"key"`
+		Value string `json:"value"`
+	} `json:"properties"`
+}
 
-	r, err := http.Get(fmt.Sprintf("https://marketplace.visualstudio.com/items?itemName=%s.%s", publisher, name))
+type QueryResult struct {
+	Results []struct {
+		Extensions []struct {
+			Publisher struct {
+				PublisherName string `json:"publisherName"`
+			} `json:"publisher"`
+			ExtensionName string               `json:"extensionName"`
+			Versions      []QueryResultVersion `json:"versions"`
+		} `json:"extensions"`
+		// PagingToken    any `json:"pagingToken"`
+	} `json:"results"`
+}
+
+func getVersion(publisher, name, engine string) string {
+
+	targetVersion, err := semver.NewVersion(engine)
 	if err != nil {
 		panic(err)
 	}
 
-	defer r.Body.Close()
-
-	b, err := io.ReadAll(r.Body)
+	// https://github.com/NixOS/nixpkgs/blob/014ba34da35c14b6cad82b07a1245f3251e78645/pkgs/applications/editors/vscode/extensions/ms-python.python/default.nix#L64
+	req, err := http.NewRequest(http.MethodPost,
+		"https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery",
+		strings.NewReader(fmt.Sprintf(`{"filters":[{"criteria":[{"filterType":7,"value":"%s.%s"}]}],"flags":16}`, publisher, name)))
 	if err != nil {
 		panic(err)
 	}
 
-	var re = regexp.MustCompile(`(?m)"VersionValue":"([^"]+)"`)
+	req.Header.Set("accept", "application/json;api-version=3.0-preview.1")
+	req.Header.Set("content-type", "application/json")
 
-	m := re.FindAllStringSubmatch(string(b), -1)
-
-	if m[0][1] == "" {
-		panic(string(b))
+	c := &http.Client{
+		Timeout: time.Second * 120,
 	}
 
-	return m[0][1]
+	res, err := c.Do(req)
+	if err != nil {
+		panic(err)
+	}
+
+	defer res.Body.Close()
+
+	var result QueryResult
+	err = json.NewDecoder(res.Body).Decode(&result)
+	if err != nil {
+		panic(err)
+	}
+
+	var versions []QueryResultVersion
+
+LABEL:
+	for i := range result.Results {
+		for j := range result.Results[i].Extensions {
+			if result.Results[i].Extensions[j].Publisher.PublisherName == publisher && result.Results[i].Extensions[j].ExtensionName == name {
+				versions = result.Results[i].Extensions[j].Versions
+				break LABEL
+			}
+		}
+	}
+
+	sort.Slice(versions, func(i, j int) bool {
+		return versions[i].LastUpdated.After(versions[j].LastUpdated)
+	})
+
+	for _, version := range versions {
+		for _, property := range version.Properties {
+			if property.Key == ENGINE {
+				v, err := semver.NewConstraint(property.Value)
+				if err != nil {
+					panic(err)
+				}
+
+				if v.Check(targetVersion) {
+					return version.Version
+				}
+
+				break
+			}
+		}
+	}
+
+	panic("failed")
 }
 
 func getHash(publisher, name, version string) string {
@@ -73,6 +147,7 @@ func getHash(publisher, name, version string) string {
 func main() {
 
 	path := flag.String("path", "ext.json", "")
+	engine := flag.String("engine", "", "")
 	flag.Parse()
 
 	b, err := os.ReadFile(*path)
@@ -102,7 +177,7 @@ func main() {
 				panic("name")
 			}
 
-			version := getVersion(ext.Publisher, ext.Name)
+			version := getVersion(ext.Publisher, ext.Name, *engine)
 			if version != ext.Version {
 				modified = true
 				ext.Version = version
