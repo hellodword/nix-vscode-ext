@@ -1,15 +1,25 @@
 name: Check updates
 
 on:
+  push:
+      branches:
+        - 'main'
   workflow_dispatch:
   schedule:
     - cron: "30 0,12 * * *"
 
 jobs:
   stale:
+  
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [master, nixos-unstable, nixpkgs-unstable, nixos-unstable-small]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 'main'
+
       - uses: actions/setup-go@v4
 
       - name: install nix
@@ -21,23 +31,40 @@ jobs:
       - name: generate
         run: |
           . ~/.nix-profile/etc/profile.d/nix.sh
-          engine="$(env NIXPKGS_ALLOW_UNFREE=1 nix derivation show --impure github:nixos/nixpkgs/nixos-unstable#vscode | jq -r '.[] | .env.version')"
-          [ -n "$engine" ]
-          go run . -path ./ext.json -engine "$engine"
 
-      - name: commit
-        run: |
-          export GIT_COMMIT_MESSAGE="update"
+          TARGET="${{ matrix.branch }}"
+          [ "$TARGET" != "main" ]
+
+          engine="$(env NIXPKGS_ALLOW_UNFREE=1 nix derivation show --impure github:nixos/nixpkgs/$TARGET#vscode | jq -r '.[] | .env.version')"
+          [ -n "$engine" ]
+          cp -r "$(pwd)" /tmp/main
+          go run . -list ./ext.json -engine "$engine" -output "/tmp/main/ext.json" -force
+
+          git checkout --orphan "$TARGET"
+          git rm -rf .
+
+          if [ "$(git ls-remote --heads origin refs/heads/$TARGET | wc -l)" -eq "0" ]; then
+            export GIT_COMMIT_MESSAGE="init"
+          else
+            export GIT_COMMIT_MESSAGE="update"
+            git pull origin "$TARGET"
+          fi
+
+          cp /tmp/main/flake.* ./
+          cp /tmp/main/*.nix ./
+          cp /tmp/main/ext.json ./
+          git add flake.*
+          git add *.nix
+          git add ext.json
+
           echo "${GIT_COMMIT_MESSAGE}"
 
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
 
-          if [ $(git status --porcelain | wc -l) -eq "0" ]; then
+          if [ "$(git status --porcelain | wc -l)" -eq "0" ]; then
             echo "  🟢 Git repo is clean."
           else
-            git add ext.json
-
             git commit -m "${GIT_COMMIT_MESSAGE}"
-            git push -u origin master
+            git push -u origin "$TARGET"
           fi

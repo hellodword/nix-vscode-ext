@@ -146,11 +146,13 @@ func getHash(publisher, name, version string) string {
 
 func main() {
 
-	path := flag.String("path", "ext.json", "")
+	list := flag.String("list", "ext.json", "")
+	output := flag.String("output", "ext.json", "")
 	engine := flag.String("engine", "", "")
+	force := flag.Bool("force", false, "")
 	flag.Parse()
 
-	b, err := os.ReadFile(*path)
+	b, err := os.ReadFile(*list)
 	if err != nil {
 		panic(err)
 	}
@@ -195,15 +197,15 @@ func main() {
 		}
 	}
 
-	output, err := json.MarshalIndent(exts, "", "    ")
+	result, err := json.MarshalIndent(exts, "", "    ")
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(string(output))
+	fmt.Println(string(result))
 
-	if modified {
-		err = os.WriteFile("./ext.json", output, 0664)
+	if modified || *force {
+		err = os.WriteFile(*output, result, 0664)
 		if err != nil {
 			panic(err)
 		}
