@@ -27,6 +27,10 @@ jobs:
           yes | sh <(curl -L https://nixos.org/nix/install) --no-daemon
           mkdir -p ~/.config/nix
           echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+          set +x
+          echo "access-tokens = github.com=$GITHUB_ACCESS_TOKEN" >> ~/.config/nix/nix.conf
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: generate
         run: |
