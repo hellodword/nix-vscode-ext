@@ -3,16 +3,16 @@
         "python": {
             "name": "python",
             "publisher": "ms-python",
-            "version": "2023.23.13481009",
-            "sha256": "0256c3qizvnl1b4yivyi7d83mi4ah4awik67advg60b0c85zhbc8"
+            "version": "2023.23.13521007",
+            "sha256": "1qqf4zrbylfar30g9r552bfmy73rczxwjvglz1pjw8mgkql2jcfj"
         }
     },
     "ms-vscode-remote": {
         "remote-containers": {
             "name": "remote-containers",
             "publisher": "ms-vscode-remote",
-            "version": "0.327.0",
-            "sha256": "0asswm55bx5gpz08cgpmgfvnb0494irj0gsvzx5nwknqfzpj07lz"
+            "version": "0.329.0",
+            "sha256": "1y2r34dc48aj55b5nhdj58qkbvgipcdaiv00vp2q154rmlwx7lz9"
         },
         "remote-ssh": {
             "name": "remote-ssh",
