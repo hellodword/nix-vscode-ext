@@ -3,8 +3,8 @@
         "python": {
             "name": "python",
             "publisher": "ms-python",
-            "version": "2024.3.10660538",
-            "sha256": "01fxlg46c0swniz9dva98s4z83qk4rx1w7swxq3h10i9c2kh2c4x"
+            "version": "2024.3.10681011",
+            "sha256": "0lx82p85qm2256qnzmb0mfsxfc3wzi94wamki0gyy202gv297yhj"
         }
     },
     "ms-vscode-remote": {
@@ -17,8 +17,8 @@
         "remote-ssh": {
             "name": "remote-ssh",
             "publisher": "ms-vscode-remote",
-            "version": "0.109.2024022215",
-            "sha256": "0bdlqbln7bhlshmi828qkv1l9646rffwaddrikfqiahrz19vm9g4"
+            "version": "0.110.2024030715",
+            "sha256": "0k8d3dxcq7xpnv49k8nhyfvky60aax5angiwd52jyj8rksp350js"
         }
     }
 }
