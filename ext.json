@@ -17,8 +17,8 @@
         "remote-ssh": {
             "name": "remote-ssh",
             "publisher": "ms-vscode-remote",
-            "version": "0.109.2024022215",
-            "sha256": "0bdlqbln7bhlshmi828qkv1l9646rffwaddrikfqiahrz19vm9g4"
+            "version": "0.110.2024030815",
+            "sha256": "1cagvj5jr6s01m3vk22yywmsqb4cmb77gf533xzl236r34ika1b6"
         }
     }
 }
