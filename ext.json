@@ -11,14 +11,14 @@
         "remote-containers": {
             "name": "remote-containers",
             "publisher": "ms-vscode-remote",
-            "version": "0.354.0",
-            "sha256": "18qqx8jgryjirr9di1l648d1adqc9c6az1lbwmpikb98ddpi8ks4"
+            "version": "0.356.0",
+            "sha256": "1yx5145qkywzhwylbml852s57r8hgimbk8a1r0mm13sqcr1mmkfy"
         },
         "remote-ssh": {
             "name": "remote-ssh",
             "publisher": "ms-vscode-remote",
-            "version": "0.110.2024032215",
-            "sha256": "14vpn8d6z24z9cdxpxrlbsqmy87qnlh4vnwd0fk2l5zn3kkh3zdd"
+            "version": "0.110.1",
+            "sha256": "1njlhj6ryhlil3qm4xscw09brwphla6qvy86p7xl96rz00lmb7bj"
         }
     }
 }
