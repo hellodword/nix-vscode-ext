@@ -3,8 +3,8 @@
         "python": {
             "name": "python",
             "publisher": "ms-python",
-            "version": "2024.8.1",
-            "sha256": "1w5nc2kg3piv3y8ahi023852izajfwp8d04ihc5yyhhhcb3y5f9d"
+            "version": "2024.9.11661012",
+            "sha256": "04d1zyl5422i1qh715ggl9qx1ln4zmm2jiaz8xxgk1gjkabpr57a"
         }
     },
     "ms-vscode-remote": {
